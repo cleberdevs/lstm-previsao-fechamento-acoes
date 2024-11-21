@@ -11,6 +11,7 @@ import yfinance as yf
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from datetime import datetime
 
 # Configurar MLflow
 mlflow.set_tracking_uri('file:' + os.path.join(os.getcwd(), 'mlruns'))
@@ -38,7 +39,7 @@ with mlflow.start_run() as run:
     # Baixar dados
     ticker = 'AMBA'
     print(f"Baixando dados históricos para o ticker: {ticker}")
-    dados_historicos = yf.download(ticker, start='2018-01-01', end='2023-01-01')
+    dados_historicos = yf.download(ticker, start='2019-01-01', end= datetime.now().strftime('%Y-%m-%d'))
     
     # Processar dados
     data = dados_historicos['Close'].values.reshape(-1, 1)
@@ -101,7 +102,7 @@ with mlflow.start_run() as run:
     plt.plot(test_dates, y_test_inv.T, 'g', label='Teste - Real')
     plt.plot(test_dates, test_predict, 'orange', label='Teste - Previsto')
 
-    plt.title(f'Previsão vs Valor Real - {ticker} (2018-2023)', fontsize=16)
+    plt.title(f'Previsão vs Valor Real - {ticker} (2019-2024)', fontsize=16)
     plt.xlabel('Data', fontsize=12)
     plt.ylabel('Preço ($)', fontsize=12)
     plt.legend(fontsize=12)
