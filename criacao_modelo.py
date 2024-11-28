@@ -39,7 +39,7 @@ with mlflow.start_run() as run:
     # Baixar dados
     ticker = 'AMBA'
     print(f"Baixando dados históricos para o ticker: {ticker}")
-    dados_historicos = yf.download(ticker, start='2019-01-01', end= datetime.now().strftime('%Y-%m-%d'))
+    dados_historicos = yf.download(ticker, start='2019-01-01', end=datetime.now().strftime('%Y-%m-%d'))
     
     # Processar dados
     data = dados_historicos['Close'].values.reshape(-1, 1)
@@ -89,41 +89,59 @@ with mlflow.start_run() as run:
     test_predict = scaler.inverse_transform(test_predict)
     y_test_inv = scaler.inverse_transform([y_test])
 
-    # Criar gráfico
-    plt.figure(figsize=(20,10))
+    # Criar figura com dois subplots lado a lado
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 10))
+    fig.suptitle(f'Previsão vs Valor Real - {ticker} (2019-2024)', fontsize=16)
 
-    # Plotar dados de treino
+    # Datas para os gráficos
     train_dates = dados_historicos.index[60:training_data_len]
-    plt.plot(train_dates, y_train_inv.T, 'b', label='Treino - Real')
-    plt.plot(train_dates, train_predict, 'r--', label='Treino - Previsto')
-
-    # Plotar dados de teste
     test_dates = dados_historicos.index[training_data_len+60:len(dados_historicos)]
-    plt.plot(test_dates, y_test_inv.T, 'g', label='Teste - Real')
-    plt.plot(test_dates, test_predict, 'orange', label='Teste - Previsto')
 
-    plt.title(f'Previsão vs Valor Real - {ticker} (2019-2024)', fontsize=16)
-    plt.xlabel('Data', fontsize=12)
-    plt.ylabel('Preço ($)', fontsize=12)
-    plt.legend(fontsize=12)
-    plt.grid(True, which='both', linestyle='--', alpha=0.6)
-    plt.xticks(rotation=45)
+    # Plotar dados de treino (gráfico da esquerda)
+    ax1.plot(train_dates, y_train_inv.T, 'b', label='Real', linewidth=2)
+    ax1.plot(train_dates, train_predict, 'r--', label='Previsto', linewidth=2)
+    ax1.set_title('Dados de Treinamento', fontsize=14)
+    ax1.set_xlabel('Data', fontsize=12)
+    ax1.set_ylabel('Preço ($)', fontsize=12)
+    ax1.legend(fontsize=12)
+    ax1.grid(True, which='both', linestyle='--', alpha=0.6)
+    ax1.tick_params(axis='x', rotation=45)
     
     # Calcular métricas
     train_mae = mean_absolute_error(y_train_inv.T, train_predict)
     train_rmse = np.sqrt(mean_squared_error(y_train_inv.T, train_predict))
     test_mae = mean_absolute_error(y_test_inv.T, test_predict)
     test_rmse = np.sqrt(mean_squared_error(y_test_inv.T, test_predict))
+    
+    # Adicionar métricas de treino
+    train_metrics = f'Métricas de Treino:\nMAE: ${train_mae:.2f}\nRMSE: ${train_rmse:.2f}'
+    ax1.text(0.02, 0.98, train_metrics, 
+             transform=ax1.transAxes,
+             verticalalignment='top',
+             bbox=dict(facecolor='white', alpha=0.8),
+             fontsize=10)
 
-    # Adicionar métricas ao gráfico
-    metrics_text = f'Métricas de Treino:\nMAE: {train_mae:.2f}\nRMSE: {train_rmse:.2f}\n\n'
-    metrics_text += f'Métricas de Teste:\nMAE: {test_mae:.2f}\nRMSE: {test_rmse:.2f}'
+    # Plotar dados de teste (gráfico da direita)
+    ax2.plot(test_dates, y_test_inv.T, 'g', label='Real', linewidth=2)
+    ax2.plot(test_dates, test_predict, 'orange', label='Previsto', linewidth=2)
+    ax2.set_title('Dados de Teste', fontsize=14)
+    ax2.set_xlabel('Data', fontsize=12)
+    ax2.set_ylabel('Preço ($)', fontsize=12)
+    ax2.legend(fontsize=12)
+    ax2.grid(True, which='both', linestyle='--', alpha=0.6)
+    ax2.tick_params(axis='x', rotation=45)
     
-    plt.figtext(0.01, 0.01, metrics_text, fontsize=10, 
-                bbox=dict(facecolor='white', alpha=0.8))
-    
+    # Adicionar métricas de teste
+    test_metrics = f'Métricas de Teste:\nMAE: ${test_mae:.2f}\nRMSE: ${test_rmse:.2f}'
+    ax2.text(0.02, 0.98, test_metrics, 
+             transform=ax2.transAxes,
+             verticalalignment='top',
+             bbox=dict(facecolor='white', alpha=0.8),
+             fontsize=10)
+
+    # Ajustar layout
     plt.tight_layout()
-
+    
     # Salvar o gráfico
     plt.savefig('previsoes_completas.png', dpi=300, bbox_inches='tight')
     
@@ -162,8 +180,8 @@ with mlflow.start_run() as run:
         
         # Imprimir métricas
         print(f"\nMétricas de Avaliação:")
-        print(f"Treino - MAE: {train_mae:.2f}, RMSE: {train_rmse:.2f}")
-        print(f"Teste - MAE: {test_mae:.2f}, RMSE: {test_rmse:.2f}")
+        print(f"Treino - MAE: ${train_mae:.2f}, RMSE: ${train_rmse:.2f}")
+        print(f"Teste - MAE: ${test_mae:.2f}, RMSE: ${test_rmse:.2f}")
 
     except Exception as e:
         print(f"Erro ao registrar modelo: {e}")
@@ -172,4 +190,4 @@ with mlflow.start_run() as run:
 print("Execução do MLflow finalizada.")
 
 # Mostrar o gráfico
-# plt.show()
+plt.show()
