@@ -1,4 +1,3 @@
-```markdown
 # Previsão de Preços de Ações usando LSTM
 
 Um aplicativo web que utiliza redes neurais LSTM (Long Short-Term Memory) para prever preços de fechamento de ações. O projeto foi desenvolvido especificamente para análise e previsão das ações da Ambarella Inc. (AMBA).
