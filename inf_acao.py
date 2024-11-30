@@ -76,7 +76,7 @@ def plot_recent_prices(dados_recentes, titulo):
     plt.tight_layout()
     return plt
 
-def save_report(stock_info, filename='stock_report.txt'):
+def save_report(stock_info, filename='relatorio_acao.txt'):
     """Salvar relatório em arquivo texto"""
     with open(filename, 'w') as f:
         f.write(f"Relatório da Ação - Gerado em {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")

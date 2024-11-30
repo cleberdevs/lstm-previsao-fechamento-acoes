@@ -19,7 +19,6 @@
             height: auto; 
         }
         
-        /* Estilo para o indicador de loading */
         .loading-spinner {
             display: none;
             text-align: center;
@@ -35,7 +34,6 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Estilo para o status da previsão */
         .prediction-status {
             display: none;
             margin-top: 10px;
@@ -48,7 +46,6 @@
             color: #666;
         }
 
-        /* Estilo para o aviso do modelo */
         .model-warning {
             display: none;
             margin-top: 15px;
@@ -73,13 +70,25 @@
         .btn {
             padding: 8px 20px;
         }
+
+        .nav-buttons {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="nav-buttons">
+            <a href="/treinamentomodelo" class="btn btn-outline-primary">
+                <i class="fas fa-cogs"></i> Painel de Treinamento
+            </a>
+            <a href="/docs" target="_blank" class="btn btn-outline-info">
+                <i class="fas fa-book"></i> Documentação API
+            </a>
+        </div>
+
         <h1 class="mb-4">Análise de Ações</h1>
         
-        <!-- Formulário para informações da ação -->
         <div class="card mb-4">
             <div class="card-body">
                 <h3>Informações da Ação</h3>
@@ -114,7 +123,6 @@
             </div>
         </div>
         
-        <!-- Formulário para previsão -->
         <div class="card">
             <div class="card-body">
                 <h3>Previsão de Preço</h3>
@@ -127,27 +135,12 @@
                     </p>
                 </div>
 
-                <!-- Aviso quando ticker diferente de AMBA é selecionado -->
                 <div class="alert alert-danger model-warning" id="wrongTickerWarning">
                     <i class="fas fa-exclamation-triangle"></i>
                     Para realizar previsões, por favor, digite o ticker AMBA acima.
                 </div>
 
-             <form id="predictionForm" class="mb-3">
-                    <div class="form-group">
-                       <!--  <label for="sequence_length" class="form-label">Período de Análise (dias):</label>
-                        <input type="number" 
-                               class="form-control" 
-                               id="sequence_length" 
-                               name="sequence_length" 
-                               value="60"
-                               min="30"
-                               max="120">
-                        <small class="form-text text-muted">
-                            Quantidade de dias históricos utilizados para fazer a previsão. 
-                            Recomendado: entre 30 e 120 dias.
-                        </small>-->
-                    </div>
+                <form id="predictionForm" class="mb-3">
                     <button type="submit" class="btn btn-success mt-3" id="predictButton">
                         <i class="fas fa-chart-line"></i> Fazer Previsão
                     </button>
@@ -173,7 +166,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Função para verificar o ticker e atualizar a interface
             function updatePredictionInterface() {
                 let ticker = $('#ticker').val().toUpperCase();
                 let isPredictionEnabled = ticker === 'AMBA';
@@ -188,15 +180,12 @@
                 }
             }
 
-            // Monitorar mudanças no ticker
             $('#ticker').on('input', function() {
                 updatePredictionInterface();
             });
 
-            // Inicializar interface
             updatePredictionInterface();
 
-            // Buscar informações da ação
             $('#stockForm').submit(function(e) {
                 e.preventDefault();
                 $('#stockLoading').show();
@@ -204,7 +193,7 @@
                 $('#stockGraph').hide();
                 
                 $.ajax({
-                    url: '/get_stock_info',
+                    url: '/obter_info_acao',
                     method: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {
@@ -231,7 +220,6 @@
                 });
             });
             
-            // Fazer previsão
             $('#predictionForm').submit(function(e) {
                 e.preventDefault();
                 if ($('#ticker').val().toUpperCase() !== 'AMBA') {
@@ -244,7 +232,7 @@
                 $('#predictionGraph').hide();
                 
                 $.ajax({
-                    url: '/make_prediction',
+                    url: '/fazer_previsao',
                     method: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {
@@ -274,7 +262,6 @@
                         $('#predictionInfo').html(html);
                         $('#predictionGraph').html('<img src="data:image/png;base64,' + response.graph + '">');
                         
-                        // Mostrar status de conclusão
                         $('#predictionStatus')
                             .removeClass('alert-danger')
                             .addClass('alert-success')
