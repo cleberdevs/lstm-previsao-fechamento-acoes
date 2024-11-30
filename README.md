@@ -8,7 +8,7 @@ Um aplicativo web que utiliza redes neurais LSTM (Long Short-Term Memory) para p
 **Grupo 60 - Pós Tech FIAP - Engenharia de Machine Learning**
 
 ### Contexto Acadêmico
-Este projeto foi desenvolvido como parte do curso de Pós-Graduação em Engenharia de Machine Learning da FIAP (Faculdade de Informática e Administração Paulista), representando a aplicação prática dos conhecimentos adquiridos em análise de dados, deep learning e desenvolvimento de sistemas inteligentes.
+Este projeto foi desenvolvido como parte do curso de Pós-Graduação em Engenharia de Machine Learning da FIAP (Faculdade de Informática e Administração Paulista), representando a aplicação prática dos conhecimentos adquiridos na Fase 4 - Deep Learning e IA.
 
 ## Funcionalidades
 
@@ -183,8 +183,6 @@ python app.py
    - Teste as APIs diretamente pela interface Swagger
    - Consulte parâmetros e respostas esperadas
 
-6. Monitore as previsões através do arquivo `historico_previsoes.csv`
-
 ## Limitações
 
 - Modelo treinado especificamente para ações da AMBA
@@ -198,6 +196,6 @@ O modelo é avaliado usando:
 - MAE (Mean Absolute Error)
 - RMSE (Root Mean Square Error)
 - Visualização de previsões vs valores reais
-- Histórico de previsões armazenado em CSV
+- Histórico de previsões pode ser monitorado através do arquivo `historico_previsoes.csv`
 
 
