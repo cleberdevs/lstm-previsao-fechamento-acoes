@@ -86,12 +86,6 @@ Se a porta 5000 estiver em uso, você pode:
 - Memória RAM mínima recomendada: 4GB
 - Espaço em disco: mínimo 1GB livre
 
-### Notas Importantes
-
-- Em sistemas macOS, a porta 5000 pode estar em uso pelo AirPlay. Considere usar uma porta alternativa.
-- Em ambiente corporativo, verifique se não há restrições de firewall para a porta escolhida.
-- Para ambiente de produção, considere usar um servidor web reverso como Nginx.
-
 ## Instalação
 
 ### Usando Docker
@@ -163,7 +157,6 @@ python app.py
 1. Acesse a interface web principal em `http://localhost:5000`
 
 2. Para acessar diferentes páginas do sistema:
-   - Página Principal: `http://localhost:5000/`
    - Painel de Treinamento: `http://localhost:5000/treinamentomodelo`
    - Documentação da API: `http://localhost:5000/docs`
 
