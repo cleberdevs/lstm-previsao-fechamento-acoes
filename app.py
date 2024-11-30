@@ -73,7 +73,7 @@ def make_stock_prediction():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)"""
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import sys
 import os
 from inf_acao import get_stock_info, plot_recent_prices
@@ -334,7 +334,17 @@ def treinar_modelo():
     }
 })
 def obter_status_treinamento():
-    return jsonify(training_status)
+    status_data = training_status.copy()
+    
+    # Se o treinamento foi concluído e o arquivo existe, adiciona o gráfico
+    if not status_data["is_running"] and status_data["end_time"] and os.path.exists('previsoes_completas.png'):
+        with open('previsoes_completas.png', 'rb') as f:
+            graph_data = base64.b64encode(f.read()).decode()
+            status_data['graph'] = graph_data
+    else:
+        status_data['graph'] = None
+        
+    return jsonify(status_data)
 
 @app.route('/treinamentomodelo/saude', methods=['GET'])
 @swag_from({
