@@ -1,83 +1,9 @@
-"""from flask import Flask, render_template, request, jsonify
-import sys
-import os
-from inf_acao import get_stock_info, plot_recent_prices
-from previsao_fechamento_acao import prepare_data_for_prediction, make_prediction, get_latest_model
-import mlflow
-import base64
-from io import BytesIO
-import matplotlib
-matplotlib.use('Agg')
-
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/get_stock_info', methods=['POST'])
-def get_stock_information():
-    ticker = request.form.get('ticker', 'AMBA')
-    
-    # Obter informações da ação
-    stock_info, dados_recentes = get_stock_info(ticker)
-    
-    if stock_info is None:
-        return jsonify({'error': 'Não foi possível obter informações da ação'})
-    
-    # Criar gráfico
-    plt = plot_recent_prices(dados_recentes, 
-                           f"Preços Recentes - {stock_info['Nome Empresa']} ({ticker})")
-    
-    # Converter gráfico para base64
-    img = BytesIO()
-    plt.savefig(img, format='png', bbox_inches='tight')
-    img.seek(0)
-    graph_url = base64.b64encode(img.getvalue()).decode()
-    plt.close()
-    
-    return jsonify({
-        'stock_info': stock_info,
-        'graph': graph_url
-    })
-
-@app.route('/make_prediction', methods=['POST'])
-def make_stock_prediction():
-    try:
-        ticker = request.form.get('ticker', 'AMBA')
-        sequence_length = int(request.form.get('sequence_length', 60))
-        
-        # Fazer previsão
-        prediction, ultimo_preco, variacao = make_prediction()
-        
-        if prediction is None:
-            return jsonify({'error': 'Erro ao fazer previsão'})
-        
-        # Capturar o gráfico atual
-        img = BytesIO()
-        matplotlib.pyplot.savefig(img, format='png', bbox_inches='tight')
-        img.seek(0)
-        graph_url = base64.b64encode(img.getvalue()).decode()
-        matplotlib.pyplot.close()
-        
-        return jsonify({
-            'prediction': f"${prediction:.2f}",
-            'ultimo_preco': f"${ultimo_preco:.2f}",
-            'variacao': f"{variacao:.2f}%",
-            'graph': graph_url
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)})
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)"""
-
 from flask import Flask, render_template, request, jsonify, send_file
+from flasgger import Swagger, swag_from
+from previsao_fechamento_acao import prepare_data_for_prediction, make_prediction, get_latest_model
+from inf_acao import get_stock_info, plot_recent_prices
 import sys
 import os
-from inf_acao import get_stock_info, plot_recent_prices
-from previsao_fechamento_acao import prepare_data_for_prediction, make_prediction, get_latest_model
 import mlflow
 import base64
 from io import BytesIO
@@ -86,9 +12,14 @@ matplotlib.use('Agg')
 import threading
 import subprocess
 from datetime import datetime
-from flasgger import Swagger, swag_from
+import shutil
 
 app = Flask(__name__)
+
+# Caminho da pasta que será zipada
+FOLDER_TO_ZIP       = 'mlruns'
+FOLDER_TO_SAVE_ZIP  = 'Modelos_Grupo_60'
+ZIP_FILE_NAME       = FOLDER_TO_SAVE_ZIP + '.zip'
 
 # Configuração do Swagger
 swagger_config = {
@@ -179,6 +110,36 @@ def execute_model_training():
 def pagina_inicial():
     """Renderiza a página inicial"""
     return render_template('index.html')
+
+@app.route('/zipar-pasta', methods=['GET'])
+def zip_folder():
+    try:
+        # Apaga o arquivo zip antigo, se existir
+        if os.path.exists(ZIP_FILE_NAME):
+            os.remove(ZIP_FILE_NAME)
+
+        # Cria o arquivo zip
+        shutil.make_archive(FOLDER_TO_SAVE_ZIP, 'zip', FOLDER_TO_ZIP)
+        
+        return jsonify({"zipFileName": ZIP_FILE_NAME}), 200
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+@app.route('/download/<file_name>', methods=['GET'])
+def download_file(file_name):
+    try:
+        # Caminho completo do arquivo
+        file_path = os.path.join(os.getcwd(), file_name)
+
+        if not os.path.exists(file_path):
+            return jsonify({"message": "Arquivo não encontrado"}), 404
+
+        # Envia o arquivo para download
+        return send_file(file_path, as_attachment=True)
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 @app.route('/obter_info_acao', methods=['POST'])
 @swag_from({
@@ -364,4 +325,9 @@ def verificar_saude():
     })
 
 if __name__ == '__main__':
+    # Certifique-se de que a pasta que você quer zipar existe
+    if not os.path.exists(FOLDER_TO_ZIP):
+        os.makedirs(FOLDER_TO_ZIP)
+        with open(os.path.join(FOLDER_TO_ZIP, "exemplo.txt"), "w") as f:
+            f.write("Este é um exemplo de arquivo.")
     app.run(host='0.0.0.0', port=5000, debug=False)    

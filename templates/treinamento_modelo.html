@@ -78,8 +78,11 @@
                     <button id="checkStatusButton" class="btn btn-info text-white">
                         <i class="fas fa-sync"></i> Atualizar Status
                     </button>
+                    <button id="saveButton" class="btn btn-success">
+                        <i class="fas fa-download"></i> Baixar Modelo
+                    </button>
                 </div>
-                
+
                 <div id="statusCard" class="status-card" style="display: none;">
                     <h4><i class="fas fa-info-circle"></i> Status do Treinamento</h4>
                     <div id="statusContent"></div>
@@ -169,9 +172,32 @@
 
         // Atualizar status automaticamente a cada 30 segundos
         setInterval(updateStatus, 30000);
+
+        $('#saveButton').click(function () {
+            // Chama a rota para zipar a pasta
+            $.get('/zipar-pasta', function (response) {
+                // Verifica se o arquivo zip foi gerado com sucesso
+                if (response.zipFileName) {
+                    const zipFileName = response.zipFileName;
         
+                    // Cria um link temporário para baixar o arquivo
+                    const a = document.createElement('a');
+                    a.href = `/download/${zipFileName}`;
+                    a.download = zipFileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    alert('Erro ao zipar a pasta: Nenhum arquivo foi gerado.');
+                }
+            }).fail(function (xhr) {
+                alert('Erro ao zipar e baixar a pasta: ' + xhr.responseJSON.message);
+            });
+        }); 
+
         // Verificar status inicial
         updateStatus();
+
     </script>
 </body>
 </html>

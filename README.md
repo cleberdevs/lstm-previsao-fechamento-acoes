@@ -151,6 +151,8 @@ python app.py
 - `POST /fazer_previsao`: Realiza previsão de preço
 - `POST /treinamentomodelo/treinar`: Inicia treinamento
 - `GET /treinamentomodelo/status`: Status do treinamento
+- `GET /treinamentomodelo/zipar-pasta`: Zipar a pasta do modelo
+- `GET /treinamentomodelo/download`: Download da pasta zipada do modelo
 
 ## Uso
 
@@ -170,6 +172,7 @@ python app.py
    - Acompanhe o status do treinamento em tempo real
    - Visualize métricas de desempenho
    - Veja gráficos comparativos de treino e teste
+   - Baixar a pasta zipado do modelo gerado
 
 5. Na documentação da API (`/docs`):
    - Explore todos os endpoints disponíveis
