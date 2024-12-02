@@ -110,7 +110,7 @@ docker run -p 5000:5000 lstm-previsao-acoes
 
 1. Clone o repositório e instale as dependências:
 ```bash
-git clone https://github.com/seu-usuario/lstm-previsao-fechamento-acoes.git
+git clone https://github.com/cleberdevs/lstm-previsao-fechamento-acoes.git
 cd lstm-previsao-fechamento-acoes
 pip install -r requirements.txt
 ```
